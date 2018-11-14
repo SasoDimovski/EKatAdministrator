@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="eKat" basedir="../" default="default">
+
+	<property file="build/build.properties" />
+
+	<target name="default">
+		<antcall target="init" />
+		<antcall target="compile.java" />
+		<antcall target="create.war" />
+	</target>
+
+	<target name="init">
+		<delete dir="${war.folder}" />
+		
+		<mkdir dir="${temp.folder}" />
+		<mkdir dir="${classes.folder}" />
+		<mkdir dir="${war.folder}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="compile.java">
+		<javac destdir="${classes.folder}" failonerror="true" fork="true" memorymaximumsize="512m" debug="true" encoding="UTF-8" source="1.5" target="1.5" >
+			<src path="${src.folder}" />
+			<classpath>
+				<fileset dir="${lib.folder}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		
+		<copy toDir="${classes.folder}">
+			<fileset dir="${src.folder}">
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		
+	</target>
+	
+	<target name="create.war">
+		<war destfile="${war.folder}/${war.name}">
+			<fileset dir="public_html">
+				<exclude name="**/**.svn/**" />
+			</fileset>
+			<classes dir="${temp.folder}/classes" />
+
+			<lib dir="${lib.folder}" >
+				<exclude name="servlet.jar" />
+				<exclude name="jaws.jar" />
+			</lib>
+		</war>
+	</target>
+
+</project>

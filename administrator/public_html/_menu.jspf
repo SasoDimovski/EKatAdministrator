@@ -1,0 +1,46 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+  <aside class="main-sidebar">
+        <section class="sidebar">
+          <ul class="sidebar-menu">
+            <li class="header">Главно мени</li>
+             <li <%if ("1".equals(mv)){out.println("class='active'");} %>>
+              <a href="../Users/ModuleList.jsp?mv=1">
+                <i class="fa fa-users"></i> <span>Корисници</span> 
+              </a>
+            </li>
+<%--             <li <%if ("2".equals(mv)){out.println("class='active'");} %>> --%>
+<!--               <a href="../Applications/ModuleList.jsp?mv=2"> -->
+<!--                 <i class="fa fa-list"></i> <span>Апликации</span>  -->
+<!--               </a> -->
+<!--             </li> -->
+            <li <%if ("3".equals(mv)){out.println("class='active'");} %>>
+              <a href="../Groups/ModuleList.jsp?mv=3">
+                <i class="fa fa-bars"></i> <span>Групи</span> 
+              </a>
+            </li>
+            <li <%if ("4".equals(mv)){out.println("class='active'");} %>>
+              <a href="../Modules/ModuleList.jsp?mv=4">
+                <i class="fa fa-indent"></i> <span>Привилегии</span> 
+              </a>
+            </li>
+            <li <%if ("5".equals(mv)){out.println("class='active'");} %>>
+              <a href="../WorkGroups/ModuleList.jsp?mv=5">
+                <i class="fa fa-list"></i> <span>Работни групи</span> 
+              </a>
+            </li>
+           <li class="treeview <%if ("6".equals(mv)||"7".equals(mv)||"8".equals(mv)){out.println("active");} %>"  >
+              <a href="#">
+                <i class="fa fa-share"></i> <span>Статистика</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li <%if ("6".equals(mv)){out.println("class='active'");} %>><a href="../Statistic/ModuleList.jsp?mv=6" ><i class="fa fa-book text-red"></i>Корисници</a></li>
+                <li <%if ("7".equals(mv)){out.println("class='active'");} %>><a href="../Statistic/ModuleList.jsp?mv=7"><i class="fa fa-book text-yellow"></i>Групи</a></li>
+                <li <%if ("8".equals(mv)){out.println("class='active'");} %>><a href="../Statistic/ModuleList.jsp?mv=8"><i class="fa fa-book text-aqua"></i>Работни групи</a></li>
+              </ul>
+            </li>
+
+
+          </ul>
+       </section>
+     </aside>

@@ -1,0 +1,255 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("WorkGroups/_get_workgroups.jspf: ");
+	
+	
+	String _limit = "50";
+
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+    String ID            = null;
+    String ID_WG_PRE            = null;
+    String LINK_NAME            = null;
+    
+    String DEP_ID            = null;
+    String DEP_NAME            = null;
+    String NAME            = null;
+    
+    String COD_DP            = null;
+    String DP_NAME            = null;
+    
+    String LINK_COD_DP            = null;
+    String LINK_DP_NAME            = null;
+    
+    String KO            = null;
+    String ARHS            = null;
+    String HEAD            = null;
+    String USERS            = null;
+    
+	
+	try {
+		sql   = "begin "+ReadDBProperties.getProperty("conn_uname")+".api_work_group_admin.get_work_groups_admin(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?); end;";
+		conn = DBConnection.getConnection(session);
+
+		cstmt = conn.prepareCall(sql);
+
+		cstmt.setString(1, search1);
+		cstmt.setString(2, search2);
+		cstmt.setString(3, search4);
+		cstmt.setString(4, search3);
+		cstmt.setString(5, search5);
+		cstmt.setString(6, search6);
+		cstmt.setString(7, search7);
+		cstmt.setString(8, search8);
+		cstmt.setString(9, pg);
+		cstmt.setString(10, _limit);
+		cstmt.registerOutParameter(11, OracleTypes.VARCHAR); // prikazani zapisi
+		cstmt.registerOutParameter(12, OracleTypes.VARCHAR); // vkupen broj na zapisi
+		cstmt.registerOutParameter(13, OracleTypes.CURSOR); // list
+		cstmt.registerOutParameter(14, OracleTypes.VARCHAR); // errid
+		cstmt.registerOutParameter(15, OracleTypes.VARCHAR); // errmsg
+
+		cstmt.execute();
+
+		String errid = cstmt.getString(14);
+		String errmsg = cstmt.getString(15);
+		
+		String _prikazani = cstmt.getString(12);
+		String _vkupno = cstmt.getString(11);
+
+		if (errmsg == null) {
+			rs = (ResultSet) cstmt.getObject(13);
+			//System.out.println("_vkupno:"+_vkupno);
+			if (!"0".equals(_prikazani)) {
+				
+				
+//===============================================================================================================================	
+		int  page_num= Integer.parseInt(pg);//broj na page
+		int  prikazani = Integer.parseInt(_prikazani);//prikazan broj na zapisi
+		int  vkupno = Integer.parseInt(_vkupno);//vkupen broj na zapisi
+		int  limit = Integer.parseInt(_limit);//definiran broj na zapisi
+		
+				double  _rec_count = Integer.parseInt(_vkupno);
+				double  _rec_limit = Integer.parseInt(_limit);
+				double  _page_vkupno = new Float( Math.ceil( _rec_count / _rec_limit));
+				
+		int page_vkupno= (int) _page_vkupno;//zaokruzen broj na strani
+		
+		
+		
+		int  prikazani_od = 0;
+			if( page_num!=0)
+			{
+				prikazani_od = (limit * (page_num)) ;
+			}
+			else
+			{
+				prikazani_od = 0;
+			}
+			
+		int  prikazani_do=prikazani_od+limit;
+		if (prikazani<limit) {prikazani_do=vkupno;}
+
+		String query=request.getQueryString();
+		query = query.replace("&pg="+page_num,"");
+//===============================================================================================================================	
+%>
+<!-- =============================================================================================================================== -->
+             <div class="box-header text-right">
+	             прикажани (од <strong><%=prikazani_od+1%></strong> до <strong><%=prikazani_do%></strong>) од вкупно: <strong><%=vkupno%></strong> 
+	            <%if( page_num!=0){int previous_page=page_num-1;%> | <a href="?<%=query%>&pg=<%=previous_page%>">претходни </a> <%}%> 
+	            <%if( page_num<page_vkupno-1){int next_page=page_num+1;%> | <a href="?<%=query%>&pg=<%=next_page%>">следни </a><%}%>
+             </div>
+<!-- =============================================================================================================================== --> 
+                   <table class="table table-hover table-striped table-condensed">
+                    <tr>
+                      <th>ID</th>
+                      <th>Назив</th>
+                      <th>Град</th>
+                      <th>Одделение</th>
+                      <th>Поврзано</th>
+                      <th>КО</th>
+                      <th>Арх.</th>
+                      <th>Рак.</th>
+                      <th>Кор.</th>
+                      <th>&nbsp;</th>
+                      <th>&nbsp;</th>
+                    </tr>
+	<%
+		while (rs.next()) {
+
+			ID = rs.getString("ID");if (ID==null){ID="";}//id na grupa
+			NAME = rs.getString("NAME");if (NAME==null){NAME="";}// ime na grupa
+			ID_WG_PRE = rs.getString("ID_WG_PRE");if (ID_WG_PRE==null){ID_WG_PRE="";}// id na povrzana grupa
+			LINK_NAME = rs.getString("LINK_NAME");if (LINK_NAME==null){LINK_NAME="";}// ime na povrzana grupa
+			DEP_ID = rs.getString("DEP_ID");if (DEP_ID==null){DEP_ID="";}// id na oddelenie
+			DEP_NAME = rs.getString("DEP_NAME");if (DEP_NAME==null){DEP_NAME="";}// ime na oddelenie
+			
+			COD_DP = rs.getString("COD_DP");if (COD_DP==null){COD_DP="";}// id na grad na grupa
+			DP_NAME = rs.getString("DP_NAME");if (DP_NAME==null){DP_NAME="";}// ime na grad na grupa
+			
+			LINK_COD_DP = rs.getString("LINK_COD_DP");if (LINK_COD_DP==null){LINK_COD_DP="";}// id na grad na povrzana grupa
+			LINK_DP_NAME = rs.getString("LINK_DP_NAME");if (LINK_DP_NAME==null){LINK_DP_NAME="";}// ime na grad na povrzana grupa
+			
+			KO = rs.getString("NUM_COD_CC");if (KO==null){KO="";}//
+			ARHS = rs.getString("NUM_ARHSIGN");if (ARHS==null){ARHS="";}//
+			HEAD = rs.getString("NUM_MANAGERS");if (HEAD==null){HEAD="";}//
+			USERS = rs.getString("NUM_USERS");if (USERS==null){USERS="";}//
+
+
+			//System.out.println("rrr"+КО+ARHS+HEAD+USERS);
+		    
+	%>
+
+                    <tr>
+                      <td><%=ID%></td>   
+                      <td><%=NAME%></td>   
+                      <td><%=DP_NAME%></td>
+                      <td><%=DEP_NAME%></td>
+                      <td <%if (!"".equals(ID_WG_PRE)){out.print("style='color:#ff7800'");}%>><%=LINK_NAME%> <%if (!"".equals(ID_WG_PRE)){out.print("("+LINK_DP_NAME+")");}%></td>  
+	                  <td>
+	                  <%if (!"0".equals(KO)) {%>
+                      <a class="btn btn-warning btn-xs" data-toggle="modal" data-target="#ModalView1" onClick="viewWorgGroupsAssignedTips('<%=ID%>','1','KO')"  title="Број на доделени катастарски општини"><%=KO%></a>
+                      <%}%>
+	                  <%--<%//if (!"0".equals(КО)) {%><span class="label label-warning" title="Број на доделени катастарски општини"><%=КО%></span><%//}%> --%>
+	                  </td>
+	                  <td>
+	                  <%if (!"0".equals(ARHS)) {%>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target="#ModalView1" onClick="viewWorgGroupsAssignedTips('<%=ID%>','1','ARHS')"  title="Број на доделени архивски знаци"><%=ARHS%>
+                      </a>
+                      <%}%>
+                      <%-- <%//if (!"0".equals(ARHS)) {%><span class="label label-danger" title="Број на доделени архивски знаци"><%=ARHS%></span><%//}%></td> --%>
+	                  <td>
+	                  <%if (!"0".equals(HEAD)) {%>
+                      <a class="btn btn-success btn-xs" data-toggle="modal" data-target="#ModalView1" onClick="viewWorgGroupsAssignedTips('<%=ID%>','1','HEAD')"  title="Број на доделени раководители"><%=HEAD%>
+                      </a>
+                      <%}%>	                 
+<%--                        <%//if (!"0".equals(HEAD)) {%><span class="label label-success" title="Број на доделени раководители"><%=HEAD%></span><%//}%></td> --%>
+	                  <td>
+	                  <%if (!"0".equals(USERS)) {%>
+                      <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#ModalView1" onClick="viewWorgGroupsAssignedTips('<%=ID%>','1','USERS')"  title="Број на доделени корисници"><%=USERS%>
+                      </a>
+	                  <%}%>
+<%-- 	                  <%//if (!"0".equals(USERS)) {%><span class="label label-default" title="Број на доделени корисници"><%=USERS%></span><%//}%></td> --%>
+                      
+                      
+                      <td><a class="btn btn-primary btn-xs" href="ModuleEdit.jsp?<%=query%>&pg=<%=page_num%>&id=<%=ID%>"><i class="fa fa-edit"></i></a></td>
+                      <td>
+                      <%if ("0000".equals(KO+ARHS+HEAD+USERS)){%>
+                      <a class="btn btn-danger btn-xs open_modal" data-toggle="modal" data-target="#ModalDel" data-sif="<%=ID%>" data-naziv="<%=NAME%>" data-query="<%=query%>"><i class="fa fa-exclamation-triangle"></i> </a>
+                      <%}%>
+                      <%if (!"0000".equals(KO+ARHS+HEAD+USERS)){%>
+                      <a class="btn btn-danger btn-xs open_modal" data-toggle="modal" data-target="#ModalView"><i class="fa fa-exclamation-triangle"></i></a></td>
+                      <%}%>
+                    </tr>
+
+	<%
+		}
+	%>
+</table>
+<!-- =============================================================================================================================== -->
+             <div class="box-header text-right">
+	             прикажани (од <strong><%=prikazani_od+1%></strong> до <strong><%=prikazani_do%></strong>) од вкупно: <strong><%=vkupno%></strong> 
+	            <%if( page_num!=0){int previous_page=page_num-1;%> | <a href="?<%=query%>&pg=<%=previous_page%>">претходни </a> <%}%> 
+	            <%if( page_num<page_vkupno-1){int next_page=page_num+1;%> | <a href="?<%=query%>&pg=<%=next_page%>">следни </a><%}%>
+             </div>
+<!-- =============================================================================================================================== --> 
+<%
+	} else {
+%>
+             <div class="box-header text-left"><br><strong>Нема записи !</strong><br><br></div>
+
+<%
+	}
+
+			rs.close();
+			cstmt.close();
+			// conn.close();
+		} else {
+		
+		%>
+
+			<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+           <%
+           cstmt.close();
+           
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	} finally {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+%>
+
+
+

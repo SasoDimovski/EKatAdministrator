@@ -1,0 +1,69 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<header class="main-header">
+        <!-- Logo -->
+        <a href="../Main/ModuleMain.jsp" class="logo">
+          <span class="logo-lg">Администратор</span>
+        </a>
+        
+        
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top" role="navigation">
+          <!-- Sidebar toggle button-->
+          <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          
+          
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+            
+            
+            
+              <!-- Messages: style can be found in dropdown.less-->
+
+              <!-- Notifications: style can be found in dropdown.less -->
+
+              <!-- Tasks: style can be found in dropdown.less -->
+
+              <!-- User Account: style can be found in dropdown.less -->
+              <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+
+                  <span class="hidden-xs"><small>Најавен корисник:</small> <strong><%=session.getAttribute("USERNAME")%></strong></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- User image -->
+
+                  <!-- Menu Body -->
+                  <li class="user-body">
+                  <small>ID:</small> <%=session.getAttribute("ID_ADMIN")%><br> 
+                  <small>Корисничко име:</small> <%=session.getAttribute("USERNAME")%><br>  
+                  <small>Име и презиме:</small> <strong><%=session.getAttribute("SURNAME") +" "+session.getAttribute("NAME")%></strong><br>
+         
+                  
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    <div class="pull-right">
+                      <a href="../Login/ModuleLogout.jsp" class="btn btn-default btn-flat">Одјавa</a>
+                    </div>
+                  </li>
+                </ul>
+                
+                
+                
+              </li>
+              <!-- Control Sidebar Toggle Button -->
+              <li>
+                <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+              </li>
+              
+              
+              
+            </ul>
+          </div>
+        </nav>
+      </header>

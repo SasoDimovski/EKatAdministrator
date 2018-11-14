@@ -1,0 +1,195 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("Groups/_get_groups.jspf: ");
+	
+	String _limit = "50";
+
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+	String SIF = null;
+	String NAZIV = null;
+	String OPOMBE = null;
+
+	String modul_count= null;
+	
+	try {
+		sql = "begin " + ReadDBProperties.getProperty("conn_uname")+ ".api_codes.get_skupina(?,?,?,?,?,?,?,?,?,?); end;";
+		conn = DBConnection.getConnection(session);
+
+		cstmt = conn.prepareCall(sql);
+
+		cstmt.setString(1, search1);
+		cstmt.setString(2, search2);
+		cstmt.setString(3, search9);
+		cstmt.setString(4, pg);
+		cstmt.setString(5, _limit);
+		cstmt.registerOutParameter(6, OracleTypes.VARCHAR); // prikazani zapisi
+		cstmt.registerOutParameter(7, OracleTypes.VARCHAR); // vkupen broj na zapisi
+		cstmt.registerOutParameter(8, OracleTypes.CURSOR); // list
+		cstmt.registerOutParameter(9, OracleTypes.VARCHAR); // errid
+		cstmt.registerOutParameter(10, OracleTypes.VARCHAR); // errmsg
+
+		cstmt.execute();
+
+		String errid = cstmt.getString(9);
+		String errmsg = cstmt.getString(10);
+		
+		String _prikazani = cstmt.getString(7);
+		String _vkupno = cstmt.getString(6);
+
+		if (errmsg == null) {
+			rs = (ResultSet) cstmt.getObject(8);
+			//System.out.println("_vkupno:"+_vkupno);
+			if (!"0".equals(_prikazani)) {
+				
+				
+//===============================================================================================================================	
+		int  page_num= Integer.parseInt(pg);//broj na page
+		int  prikazani = Integer.parseInt(_prikazani);//prikazan broj na zapisi
+		int  vkupno = Integer.parseInt(_vkupno);//vkupen broj na zapisi
+		int  limit = Integer.parseInt(_limit);//definiran broj na zapisi
+		
+				double  _rec_count = Integer.parseInt(_vkupno);
+				double  _rec_limit = Integer.parseInt(_limit);
+				double  _page_vkupno = new Float( Math.ceil( _rec_count / _rec_limit));
+				
+		int page_vkupno= (int) _page_vkupno;//zaokruzen broj na strani
+		
+		
+		
+		int  prikazani_od = 0;
+			if( page_num!=0)
+			{
+				prikazani_od = (limit * (page_num)) ;
+			}
+			else
+			{
+				prikazani_od = 0;
+			}
+			
+		int  prikazani_do=prikazani_od+limit;
+		if (prikazani<limit) {prikazani_do=vkupno;}
+
+		String query=request.getQueryString();
+		query = query.replace("&pg="+page_num,"");
+//===============================================================================================================================	
+%>
+<!-- =============================================================================================================================== -->
+             <div class="box-header text-right">
+	             прикажани (од <strong><%=prikazani_od+1%></strong> до <strong><%=prikazani_do%></strong>) од вкупно: <strong><%=vkupno%></strong> 
+	            <%if( page_num!=0){int previous_page=page_num-1;%> | <a href="?<%=query%>&pg=<%=previous_page%>">претходни </a> <%}%> 
+	            <%if( page_num<page_vkupno-1){int next_page=page_num+1;%> | <a href="?<%=query%>&pg=<%=next_page%>">следни </a><%}%>
+             </div>
+<!-- =============================================================================================================================== --> 
+                   <table class="table table-hover table-striped table-condensed">
+                    <tr>
+                      <th width="5%">ID</th>
+                      <th>Име на група</th>
+                      <th>Забелешка</th>
+                      <th>Привилегии</th>
+                      <th>&nbsp;</th>
+                      <th>&nbsp;</th>
+                    </tr>
+	<%
+		while (rs.next()) {
+
+			SIF = rs.getString("SIF");if (SIF==null){SIF="";}
+			NAZIV = rs.getString("NAZIV");if (NAZIV==null){NAZIV="";}
+			OPOMBE = rs.getString("OPOMBE");if (OPOMBE==null){OPOMBE="";}
+			modul_count = rs.getString("modul_count");if (modul_count==null){modul_count="";}
+			//System.out.println("IME"+IME);
+
+	%>
+
+                    <tr>
+                      <td><%=SIF%></td>
+                      <td><%=NAZIV%></td>
+                      <td><%=OPOMBE%></td>
+                      <td>
+                      <%if (!"0".equals(modul_count)) {%>
+                      <a class="btn btn-success btn-xs" data-toggle="modal" data-target="#ModalView" onClick="viewAssignedModules('<%=SIF%>','1')"  title="Број на доделени привилегии"><%=modul_count%>
+                      </a>
+                      <%}%>
+                       </td>
+                      <td><a class="btn btn-primary btn-xs" href="ModuleEdit.jsp?<%=query%>&pg=<%=page_num%>&id=<%=SIF%>"><i class="fa fa-edit"></i></a></td>
+
+                      <td>
+                           <a class="btn btn-danger btn-xs open_modal" data-toggle="modal" data-target="#ModalDel" data-sif="<%=SIF%>"  data-naziv="<%=NAZIV%>"   data-query="<%=query%>">
+                                 <i class="fa fa-exclamation-triangle"></i>
+                           </a>
+                      </td>
+
+
+                     
+                    </tr>
+
+	<%
+		}
+	%>
+</table>
+<!-- =============================================================================================================================== -->
+             <div class="box-header text-right">
+	             прикажани (од <strong><%=prikazani_od+1%></strong> до <strong><%=prikazani_do%></strong>) од вкупно: <strong><%=vkupno%></strong> 
+	            <%if( page_num!=0){int previous_page=page_num-1;%> | <a href="?<%=query%>&pg=<%=previous_page%>">претходни </a> <%}%> 
+	            <%if( page_num<page_vkupno-1){int next_page=page_num+1;%> | <a href="?<%=query%>&pg=<%=next_page%>">следни </a><%}%>
+             </div>
+<!-- =============================================================================================================================== --> 
+<%
+	} else {
+%>
+             <div class="box-header text-left"><br><strong>Нема записи !</strong><br><br></div>
+
+<%
+	}
+
+			rs.close();
+			cstmt.close();
+			// conn.close();
+		} else {
+		
+		%>
+
+			<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+           <%
+           cstmt.close();
+           
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	} finally {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+%>
+
+
+

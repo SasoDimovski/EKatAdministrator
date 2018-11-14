@@ -1,0 +1,162 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("Applications/_get_application.jspf: ");
+	System.out.println("id:"+id);if (id==null||"".equals(id)){id="0";}
+
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+	String SIF ="";
+	String NAZIV ="";
+	String K_NAZIV = ""; 
+	String OPOMBE = "";
+	String POT_APL = "";
+	String IME_DATOTEKA = ""; 
+	String USERNAME = "";
+	String PASSWORD = "";
+	String DB_NAME = ""; 
+	String DEBUG = "";
+	String PROJEKT = ""; 
+	String HELP_TIP = "";
+	String WIN_HELP_POT = "";
+	String WEB_HELP_POT = "";
+	String HLP_FILE = "";
+	String RLS_CONN = "";
+	String ZAKLENJENA = "";
+	String SKUPINA_PODATKOV = "";
+	String NET_SERVER = "";
+	String AVTOM_DODAJANJE_MODULOV = "";
+	
+	
+	try {
+		sql = "begin " + ReadDBProperties.getProperty("conn_uname")
+				+ ".api_codes.get_aplication(?,?,?,?,?,?,?,?,?); end;";
+		conn = DBConnection.getConnection(session);
+
+		cstmt = conn.prepareCall(sql);
+
+		cstmt.setString(1, id);
+		cstmt.setString(2, null);
+		cstmt.setString(3, "0");
+		cstmt.setString(4, "1");
+		cstmt.registerOutParameter(5, OracleTypes.VARCHAR); // prikazani zapisi
+		cstmt.registerOutParameter(6, OracleTypes.VARCHAR); // vkupen broj na zapisi
+		cstmt.registerOutParameter(7, OracleTypes.CURSOR); // list
+		cstmt.registerOutParameter(8, OracleTypes.VARCHAR); // errid
+		cstmt.registerOutParameter(9, OracleTypes.VARCHAR); // errmsg
+
+		cstmt.execute();
+
+		String errid = cstmt.getString(8);
+		String errmsg = cstmt.getString(9);
+		
+		String _prikazani = cstmt.getString(6);
+		String _vkupno = cstmt.getString(5);
+
+		if (errmsg == null) {
+			rs = (ResultSet) cstmt.getObject(7);
+			//System.out.println("_vkupno:"+_vkupno);
+			if (!"0".equals(_prikazani)) {
+				
+				
+
+		while (rs.next()) {
+
+			SIF = rs.getString("SIF");if (SIF==null){SIF="";}
+			NAZIV = rs.getString("NAZIV");if (NAZIV==null){NAZIV="";}
+			K_NAZIV = rs.getString("K_NAZIV");if (K_NAZIV==null){K_NAZIV="";} 
+			OPOMBE = rs.getString("OPOMBE");if (OPOMBE==null){OPOMBE="";}
+			POT_APL = rs.getString("POT_APL");if (POT_APL==null){POT_APL="";}
+			IME_DATOTEKA = rs.getString("IME_DATOTEKA");if (IME_DATOTEKA==null){IME_DATOTEKA="";} 
+			USERNAME = rs.getString("USERNAME");if (USERNAME==null){USERNAME="";}
+			PASSWORD = rs.getString("PASSWORD");if (PASSWORD==null){PASSWORD="";}
+			DB_NAME = rs.getString("DB_NAME");if (DB_NAME==null){DB_NAME="";} 
+			DEBUG = rs.getString("DEBUG");if (DEBUG==null){DEBUG="";}
+			PROJEKT = rs.getString("PROJEKT");if (PROJEKT==null){PROJEKT="";} 
+			HELP_TIP = rs.getString("HELP_TIP");if (HELP_TIP==null){HELP_TIP="";}
+			WIN_HELP_POT = rs.getString("WIN_HELP_POT");if (WIN_HELP_POT==null){WIN_HELP_POT="";}
+			WEB_HELP_POT = rs.getString("WEB_HELP_POT");if (WEB_HELP_POT==null){WEB_HELP_POT="";} 
+			HLP_FILE = rs.getString("HLP_FILE");if (HLP_FILE==null){HLP_FILE="";} 
+			RLS_CONN = rs.getString("RLS_CONN");if (RLS_CONN==null){RLS_CONN="";}
+			ZAKLENJENA = rs.getString("ZAKLENJENA");if (ZAKLENJENA==null){ZAKLENJENA="";} 
+			SKUPINA_PODATKOV = rs.getString("SKUPINA_PODATKOV");if (SKUPINA_PODATKOV==null){SKUPINA_PODATKOV="";}
+			NET_SERVER = rs.getString("NET_SERVER");if (NET_SERVER==null){NET_SERVER="";}
+			AVTOM_DODAJANJE_MODULOV = rs.getString("AVTOM_DODAJANJE_MODULOV");if (AVTOM_DODAJANJE_MODULOV==null){AVTOM_DODAJANJE_MODULOV="";}
+			//System.out.println("IME"+IME);
+
+		}
+
+	} 
+
+			rs.close();
+			cstmt.close();
+			// conn.close();
+		} else {
+		
+		%>
+
+			<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+           <%
+           cstmt.close();
+           
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	} finally {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	System.out.println("SIF:"+SIF);
+	System.out.println("NAZIV:"+NAZIV);
+	System.out.println("K_NAZIV:"+K_NAZIV);
+	System.out.println("OPOMBE:"+OPOMBE);
+	System.out.println("POT_APL:"+POT_APL);
+	System.out.println("IME_DATOTEKA:"+IME_DATOTEKA);
+	System.out.println("USERNAME:"+USERNAME);
+	System.out.println("PASSWORD:"+PASSWORD);
+	System.out.println("DB_NAME:"+DB_NAME);
+	System.out.println("DEBUG:"+DEBUG);
+	System.out.println("PROJEKT:"+PROJEKT);
+	System.out.println("HELP_TIP:"+HELP_TIP);
+	System.out.println("WIN_HELP_POT:"+WIN_HELP_POT);
+	System.out.println("WEB_HELP_POT:"+WEB_HELP_POT);
+	System.out.println("HLP_FILE:"+HLP_FILE);
+	System.out.println("RLS_CONN:"+RLS_CONN);
+	System.out.println("ZAKLENJENA:"+ZAKLENJENA);
+	System.out.println("SKUPINA_PODATKOV:"+SKUPINA_PODATKOV);
+	System.out.println("NET_SERVER:"+NET_SERVER);
+	System.out.println("AVTOM_DODAJANJE_MODULOV:"+AVTOM_DODAJANJE_MODULOV);
+	
+
+%>
+
+
+

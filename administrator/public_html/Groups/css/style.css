@@ -1,0 +1,8 @@
+.linkStrelka {
+color:#000;
+cursor:pointer;
+}
+.linkStrelka:hover {
+color:#00a65a;
+font-size: 100%
+}

@@ -1,0 +1,254 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("Statistic/_get_statistic_users.jspf: ");
+	
+	String _limit = "";
+	if ("".equals(search6)){_limit= "25";}else{_limit= search6;}
+
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+	String ID = null;
+	String ADMIN = null;
+	String USERNAME = null;
+	String OSP = null;
+	String GRUPA = null;
+	String GRUPA_NAZIV = null;
+	String PRIV = null;
+	String PRIV_NAZIV = null;
+	String ODDEL = null;
+	String ODDEL_NAZIV = null;
+	String HIS_DATE = null;
+	String GRAD = null;
+	
+
+
+	
+	try {
+		sql = "begin " + ReadDBProperties.getProperty("conn_uname")+ ".api_users.get_admin_activity(?,?,?,?,?,?,?,?,?,?,?,?); end;";
+		conn = DBConnection.getConnection(session);
+
+		cstmt = conn.prepareCall(sql);
+
+		cstmt.setString(1, search3);
+		cstmt.setString(2, search4);
+		cstmt.setString(3, search1);
+		cstmt.setString(4, search2);
+		cstmt.setString(5, search5);
+		cstmt.setString(6, pg);
+		cstmt.setString(7, _limit);
+		cstmt.registerOutParameter(8, OracleTypes.VARCHAR); // vkupen broj na zapisi
+		cstmt.registerOutParameter(9, OracleTypes.VARCHAR); // prikazani zapisi
+		cstmt.registerOutParameter(10, OracleTypes.CURSOR); // list
+		cstmt.registerOutParameter(11, OracleTypes.VARCHAR); // errid
+		cstmt.registerOutParameter(12, OracleTypes.VARCHAR); // errmsg
+
+		cstmt.execute();
+
+		String errid = cstmt.getString(11);
+		String errmsg = cstmt.getString(12);
+		
+		String _vkupno = cstmt.getString(8);
+		String _prikazani = cstmt.getString(9);
+
+
+		if (errmsg == null) {
+			rs = (ResultSet) cstmt.getObject(10);
+			//System.out.println("_vkupno:"+_vkupno);
+			if (!"0".equals(_prikazani)) {
+				
+				
+//===============================================================================================================================	
+		int  page_num= Integer.parseInt(pg);//broj na page
+		int  prikazani = Integer.parseInt(_prikazani);//prikazan broj na zapisi
+		int  vkupno = Integer.parseInt(_vkupno);//vkupen broj na zapisi
+		int  limit = Integer.parseInt(_limit);//definiran broj na zapisi
+		
+				double  _rec_count = Integer.parseInt(_vkupno);
+				double  _rec_limit = Integer.parseInt(_limit);
+				double  _page_vkupno = new Float( Math.ceil( _rec_count / _rec_limit));
+				
+		int page_vkupno= (int) _page_vkupno;//zaokruzen broj na strani
+		
+		
+		
+		int  prikazani_od = 0;
+			if( page_num!=0)
+			{
+				prikazani_od = (limit * (page_num)) ;
+			}
+			else
+			{
+				prikazani_od = 0;
+			}
+			
+		int  prikazani_do=prikazani_od+limit;
+		if (prikazani<limit) {prikazani_do=vkupno;}
+		
+// 		System.out.println("page_num: "+page_num);
+// 		System.out.println("prikazani: "+prikazani);
+// 		System.out.println("vkupno: "+vkupno);
+// 		System.out.println("limit: "+limit);
+// 		System.out.println("page_vkupno: "+ page_vkupno);
+// 		System.out.println("prikazani_od: "+prikazani_od);
+// 		System.out.println("prikazani_do: "+prikazani_do);
+// 		System.out.println(request.getQueryString());
+		
+		String query=request.getQueryString();
+		query = query.replace("&pg="+page_num,"");
+//===============================================================================================================================	
+%>
+             <div class="box-header text-right screen">вкупно пронајдени записи: <strong><%=vkupno%></strong></div>
+<!-- =============================================================================================================================== -->
+             <div class="box-header text-right noprint">
+	             прикажани (од <strong><%=prikazani_od+1%></strong> до <strong><%=prikazani_do%></strong>) од вкупно: <strong><%=vkupno%></strong> 
+	            <%if( page_num!=0){int previous_page=page_num-1;%> | <a href="?<%=query%>&pg=<%=previous_page%>">претходни </a> <%}%> 
+	            <%if( page_num<page_vkupno-1){int next_page=page_num+1;%> | <a href="?<%=query%>&pg=<%=next_page%>">следни </a><%}%>
+             </div>
+<!-- =============================================================================================================================== --> 
+                   <table class="table table-hover table-striped table-condensed" name="test" id="test">
+                    <tr>
+<!--                       <th>ID</th> -->
+                      <th>Администратор</th>
+                      <th>Корисник</th>
+                      <th>Град</th>
+                      <th>Датум</th>
+                      <th>Група</th>
+                      <th>Привилегија</th>
+                      <th>Одделение</th>
+
+                      <th title="Основни податоци">ОП</th>
+  
+                    </tr>
+	<%
+		while (rs.next()) {
+			ID = rs.getString("ID");if (ID==null){ID="";}
+			ADMIN = rs.getString("ADMIN");if (ADMIN==null){ADMIN="";}
+			USERNAME = rs.getString("USERNAME");if (USERNAME==null){USERNAME="";}
+			OSP = rs.getString("OSP");if (OSP==null){OSP="";}
+			GRUPA = rs.getString("GRUPA");if (GRUPA==null){GRUPA="";}
+			GRUPA_NAZIV = rs.getString("GRUPA_NAZIV");if (GRUPA_NAZIV==null){GRUPA_NAZIV="";}
+			PRIV = rs.getString("PRIV");if (PRIV==null){PRIV="";}
+			PRIV_NAZIV = rs.getString("PRIV_NAZIV");if (PRIV_NAZIV==null){PRIV_NAZIV="";}
+			ODDEL = rs.getString("ODDEL");if (ODDEL==null){ODDEL="";}
+			ODDEL_NAZIV = rs.getString("ODDEL_NAZIV");if (ODDEL_NAZIV==null){ODDEL_NAZIV="";}
+			HIS_DATE = rs.getString("HIS_DATE");if (HIS_DATE==null){HIS_DATE="";}
+			GRAD = rs.getString("GRAD");if (GRAD==null){GRAD="";}
+
+	%>
+
+                    <tr>
+<%--                       <td><%=ID%></td> --%>
+                      <td><%=ADMIN%></td>
+                      <td><%=USERNAME%></td>
+                      <td><%=GRAD%></td>
+                      <td><%=HIS_DATE%></td>  
+                      <td>
+                      <%if ("I".equals(GRUPA)) {%><span class="fa fa-plus-circle text-green"></span><%}%>
+                      <%if ("D".equals(GRUPA)) {%><span class="fa fa-minus-circle text-red"></span><%}%>
+                      <%=GRUPA_NAZIV%>
+                      </td>
+                      <td>
+                      <%if ("I".equals(PRIV)) {%><span class="fa fa-plus-circle text-green"></span><%}%>
+                      <%if ("D".equals(PRIV)) {%><span class="fa fa-minus-circle text-red"></span><%}%>
+                      <%=PRIV_NAZIV%>
+                      </td>
+                      <td>
+                      <%if ("I".equals(ODDEL)) {%><span class="fa fa-plus-circle text-green"></span><%}%>
+                      <%if ("D".equals(ODDEL)) {%><span class="fa fa-minus-circle text-red"></span><%}%>
+                      <%=ODDEL_NAZIV%>
+                      </td>
+                  
+                      <td>
+                      <%if ("U".equals(OSP)) {%>
+                      <a class="btn btn-warning btn-xs" onClick="viewChangesAdminUser('<%=ID%>')"  title="Направена промена на основни податоци">ПРОМЕНА
+                      </a>
+                      <%}%>
+                      </td>
+                    </tr>
+
+	<%
+		}
+	%>
+</table>
+<!-- =============================================================================================================================== -->
+<%if(temp_print!=null){%>
+<script type="text/javascript">
+window.print();
+</script>
+<%}
+session.setAttribute("print", null);
+%>
+
+<%if(temp_excel!=null){%>
+<script type="text/javascript">
+tableToExcel('test', 'Korisnici', 'report');
+</script>
+<%}
+session.setAttribute("excel", null);
+%>
+<!-- =============================================================================================================================== -->
+             <div class="box-header text-right noprint">
+	             прикажани (од <strong><%=prikazani_od+1%></strong> до <strong><%=prikazani_do%></strong>) од вкупно: <strong><%=vkupno%></strong> 
+	            <%if( page_num!=0){int previous_page=page_num-1;%> | <a href="?<%=query%>&pg=<%=previous_page%>">претходни </a> <%}%> 
+	            <%if( page_num<page_vkupno-1){int next_page=page_num+1;%> | <a href="?<%=query%>&pg=<%=next_page%>">следни </a><%}%>
+             </div>
+<!-- =============================================================================================================================== --> 
+<%
+	} else {
+%>
+             <div class="box-header text-left"><br><strong>Нема записи !</strong><br><br></div>
+
+<%
+	}
+
+			rs.close();
+			cstmt.close();
+			// conn.close();
+		} else {
+		
+		%>
+
+			<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+           <%
+           cstmt.close();
+           
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	} finally {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+%>
+
+
+

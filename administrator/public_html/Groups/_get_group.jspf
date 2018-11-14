@@ -1,0 +1,115 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("Groups/_get_group.jspf: ");
+	if (id==null||"".equals(id)){id="0";}
+	System.out.println("id:"+id);
+	
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+	String SIF ="";
+	String NAZIV ="";
+	String OPOMBE = "";
+	String modul_count= null;
+
+	
+	try {
+		sql = "begin " + ReadDBProperties.getProperty("conn_uname")+ ".api_codes.get_skupina(?,?,?,?,?,?,?,?,?,?); end;";
+		conn = DBConnection.getConnection(session);
+
+		cstmt = conn.prepareCall(sql);
+
+		cstmt.setString(1, id);
+		cstmt.setString(2, null);
+		cstmt.setString(3, null);
+		cstmt.setString(4, "0");
+		cstmt.setString(5, "1");
+		cstmt.registerOutParameter(6, OracleTypes.VARCHAR); // prikazani zapisi
+		cstmt.registerOutParameter(7, OracleTypes.VARCHAR); // vkupen broj na zapisi
+		cstmt.registerOutParameter(8, OracleTypes.CURSOR); // list
+		cstmt.registerOutParameter(9, OracleTypes.VARCHAR); // errid
+		cstmt.registerOutParameter(10, OracleTypes.VARCHAR); // errmsg
+
+		cstmt.execute();
+
+		String errid = cstmt.getString(9);
+		String errmsg = cstmt.getString(10);
+		
+		String _prikazani = cstmt.getString(7);
+		String _vkupno = cstmt.getString(6);
+
+		if (errmsg == null) {
+			rs = (ResultSet) cstmt.getObject(8);
+			//System.out.println("_vkupno:"+_vkupno);
+			if (!"0".equals(_prikazani)) {
+				
+				
+
+		while (rs.next()) {
+
+			SIF = rs.getString("SIF");if (SIF==null){SIF="";}
+			NAZIV = rs.getString("NAZIV");if (NAZIV==null){NAZIV="";}
+			OPOMBE = rs.getString("OPOMBE");if (OPOMBE==null){OPOMBE="";}
+			modul_count = rs.getString("modul_count");if (modul_count==null){modul_count="";}
+			//System.out.println("IME"+IME);
+
+		}
+
+	} 
+
+			rs.close();
+			cstmt.close();
+			// conn.close();
+		} else {
+		
+		%>
+
+			<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+           <%
+           cstmt.close();
+           
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	} finally {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	System.out.println("SIF:"+SIF);
+	System.out.println("NAZIV:"+NAZIV);
+	System.out.println("OPOMBE:"+OPOMBE);
+
+	
+
+%>
+
+
+

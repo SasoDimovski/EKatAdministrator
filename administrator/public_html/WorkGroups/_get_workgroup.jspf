@@ -1,0 +1,136 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("WorkGroups/_get_workgroup.jspf: ");
+	System.out.println("id:"+id);if (id==null||"".equals(id)){id="0";}
+
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+    String ID            = "";
+    String ID_WG_PRE            = "";
+    String LINK_NAME            = "";
+    
+    String DEP_ID            = "";
+    String DEP_NAME            = "";
+    String NAME            = "";
+    
+    String COD_DP            = "";
+    String DP_NAME            = "";
+
+    String LINK_COD_DP            = "";
+    String LINK_DP_NAME            = "";
+	
+	try {
+		sql   = "begin "+ReadDBProperties.getProperty("conn_uname")+".api_work_group_admin.get_work_groups_admin(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?); end;";
+		conn = DBConnection.getConnection(session);
+
+		cstmt = conn.prepareCall(sql);
+
+		cstmt.setString(1, id);
+		cstmt.setString(2, null);
+		cstmt.setString(3, null);
+		cstmt.setString(4, null);
+		cstmt.setString(5, null);
+		cstmt.setString(6, null);
+		cstmt.setString(7, null);
+		cstmt.setString(8, null);
+		cstmt.setString(9, "0");
+		cstmt.setString(10, "1");
+		cstmt.registerOutParameter(11, OracleTypes.VARCHAR); // prikazani zapisi
+		cstmt.registerOutParameter(12, OracleTypes.VARCHAR); // vkupen broj na zapisi
+		cstmt.registerOutParameter(13, OracleTypes.CURSOR); // list
+		cstmt.registerOutParameter(14, OracleTypes.VARCHAR); // errid
+		cstmt.registerOutParameter(15, OracleTypes.VARCHAR); // errmsg
+		cstmt.execute();
+
+		String errid = cstmt.getString(14);
+		String errmsg = cstmt.getString(15);
+		
+		String _prikazani = cstmt.getString(12);
+		String _vkupno = cstmt.getString(11);
+
+		if (errmsg == null) {
+			rs = (ResultSet) cstmt.getObject(13);
+			//System.out.println("_vkupno:"+_vkupno);
+			if (!"0".equals(_prikazani)) {
+				
+				
+
+		while (rs.next()) {
+
+			ID = rs.getString("ID");if (ID==null){ID="";}//id na grupa
+			NAME = rs.getString("NAME");if (NAME==null){NAME="";}// ime na grupa
+			ID_WG_PRE = rs.getString("ID_WG_PRE");if (ID_WG_PRE==null){ID_WG_PRE="";}// id na povrzana grupa
+			LINK_NAME = rs.getString("LINK_NAME");if (LINK_NAME==null){LINK_NAME="";}// ime na povrzana grupa
+			DEP_ID = rs.getString("DEP_ID");if (DEP_ID==null){DEP_ID="";}// id na oddelenie
+			DEP_NAME = rs.getString("DEP_NAME");if (DEP_NAME==null){DEP_NAME="";}// ime na oddelenie
+			
+			COD_DP = rs.getString("COD_DP");if (COD_DP==null){COD_DP="";}// id na grad na grupa
+			DP_NAME = rs.getString("DP_NAME");if (DP_NAME==null){DP_NAME="";}// ime na grad na grupa
+			
+			LINK_COD_DP = rs.getString("LINK_COD_DP");if (LINK_COD_DP==null){LINK_COD_DP="";}// id na grad na povrzana grupa
+			LINK_DP_NAME = rs.getString("LINK_DP_NAME");if (LINK_DP_NAME==null){LINK_DP_NAME="";}// ime na grad na povrzana grupa
+			
+		}
+
+	} 
+
+			rs.close();
+			cstmt.close();
+			// conn.close();
+		} else {
+		
+		%>
+
+			<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+           <%
+           cstmt.close();
+           
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	} finally {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (cstmt != null) {
+				cstmt.close();
+			}
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+
+	System.out.println("ID:"+ID);
+	System.out.println("NAME:"+NAME);
+	System.out.println("ID_WG_PRE:"+ID_WG_PRE);
+	System.out.println("DEP_ID:"+DEP_ID);
+	System.out.println("DEP_NAME:"+DEP_NAME);
+
+	
+
+%>
+
+
+

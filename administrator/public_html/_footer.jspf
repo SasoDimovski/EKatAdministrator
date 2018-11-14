@@ -1,0 +1,22 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+      <footer class="main-footer noprint">
+        <div class="pull-right hidden-xs">
+          <b>Верзија</b> 1.0.0
+        </div>
+        <strong>АКН Администратор &copy;</strong> Заштитени авторски права ИГЕА МАК
+      </footer>
+
+<!-- 
+<B>HttpSession Information:</B>
+<UL>
+<LI>Served From Server:   <b><%= request.getServerName() %></b></LI>
+<LI>Server Port Number:   <b><%= request.getServerPort() %></b></LI>
+<LI>Executed From Server: <b><%= java.net.InetAddress.getLocalHost().getHostName() %></b></LI>
+<LI>Served From Server instance: <b><%= System.getProperty("com.sun.aas.instanceName") %></b></LI>
+<LI>Executed Server IP Address: <b><%= java.net.InetAddress.getLocalHost().getHostAddress() %></b></LI>
+<LI>Session ID:    <b><%= session.getId() %></b></LI>
+<LI>Session Created:  <%= new java.util.Date(session.getCreationTime())%></LI>
+<LI>Last Accessed:    <%= new java.util.Date(session.getLastAccessedTime())%></LI>
+<LI>Session will go inactive in  <b><%= session.getMaxInactiveInterval() %> seconds</b></LI>
+</UL>
+ -->

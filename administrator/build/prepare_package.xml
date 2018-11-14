@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="release" basedir="." default="default">
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+	<!--  	application_version_tag	 -->
+	
+	<property name="release-folder" value="release" />
+	<property name="release-version-folder" value="${release-folder}/${application_version_tag}" />
+
+	<target name="default">
+		<antcall target="clean" />
+		<antcall target="init" />
+		<antcall target="package" />
+	</target>
+
+	<target name="init">	
+		<mkdir dir="${release-folder}" />
+		<mkdir dir="${release-version-folder}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${release-folder}" />
+	</target>
+	
+	<target name="package">
+		
+		<!-- copy war -->
+		<copy todir="${release-version-folder}">
+			<fileset dir="war">
+				<include name="**.war"/>
+			</fileset>
+		</copy>
+		
+		<!-- zip folder -->
+		<zip destfile="${release-folder}/${application_version_tag}.zip" basedir="${release-version-folder}" level="9"/>
+		
+	</target>
+
+</project>

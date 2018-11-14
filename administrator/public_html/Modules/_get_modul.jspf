@@ -1,0 +1,128 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%request.setCharacterEncoding("UTF-8");%>
+<%@ page import="java.sql.*"%>
+<%@ page import="Procedures.*"%>
+<%@ page import="oracle.jdbc.OracleTypes"%>
+
+
+
+<%
+	System.out.println("");
+	System.out.println("Modules/_get_modul.jspf: ");
+	System.out.println("id: "+id);
+
+	Connection conn = null;
+	CallableStatement cstmt = null;
+	ResultSet rs = null;
+	String sql = null;
+	
+	String APLIKACIJA_NAZIV= "";
+	String TIP_MODUL_NAZIV= "";
+	String APL_SIF= "";
+	String SIF= "";
+	String NAZIV= "";
+	String DATOTEKA= "";
+	String MOD_SIF= "";
+	String TIP_SIF= "";
+	String IMPVAR= "";
+	String ZAKLENJEN= "";
+	String NEXT_LEVEL= "";
+	
+	
+	
+	
+	
+	if (!"".equals(id)){
+		
+		try {
+			sql = "begin " + ReadDBProperties.getProperty("conn_uname")+ ".api_grants.get_modul(?,?,?,?); end;";
+			conn = DBConnection.getConnection(session);
+
+			cstmt = conn.prepareCall(sql);
+
+			cstmt.setString(1, id);
+			cstmt.registerOutParameter(2, OracleTypes.CURSOR); // list
+			cstmt.registerOutParameter(3, OracleTypes.VARCHAR); // errid
+			cstmt.registerOutParameter(4, OracleTypes.VARCHAR); // errmsg
+
+			cstmt.execute();
+
+			String errid = cstmt.getString(3);
+			String errmsg = cstmt.getString(4);
+			
+
+
+			if (errmsg == null) {
+				rs = (ResultSet) cstmt.getObject(2);
+
+				if (rs.next()) {
+					
+					APLIKACIJA_NAZIV= rs.getString("APLIKACIJA_NAZIV");if (APLIKACIJA_NAZIV==null){APLIKACIJA_NAZIV="";}
+					TIP_MODUL_NAZIV= rs.getString("TIP_MODUL_NAZIV");if (TIP_MODUL_NAZIV==null){TIP_MODUL_NAZIV="";}
+					APL_SIF= rs.getString("APL_SIF");if (APL_SIF==null){APL_SIF="";}
+					SIF= rs.getString("SIF");if (SIF==null){SIF="";}
+					NAZIV= rs.getString("NAZIV");if (NAZIV==null){NAZIV="";}
+				    DATOTEKA= rs.getString("DATOTEKA");if (DATOTEKA==null){DATOTEKA="";}
+				    MOD_SIF= rs.getString("MOD_SIF");if (MOD_SIF==null){MOD_SIF="";}
+				    TIP_SIF= rs.getString("TIP_SIF");if (TIP_SIF==null){TIP_SIF="";}
+
+				
+				//System.out.println("IME"+IME);
+
+		} 
+				rs.close();
+				cstmt.close();
+				// conn.close();
+			} else {
+			
+			%>
+				<div class="box-header text-left"><br>errid: <strong><%=errid%></strong><br>errmsg: <strong><%=errmsg%></strong><br><br></div>
+	        <%
+	           cstmt.close();
+	           
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (cstmt != null) {
+					cstmt.close();
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (cstmt != null) {
+					cstmt.close();
+				}
+			} catch (SQLException e2) {
+				e2.printStackTrace();
+			}
+		}
+		
+	}
+	
+
+	System.out.println("APLIKACIJA_NAZIV:"+APLIKACIJA_NAZIV);
+	System.out.println("TIP_MODUL_NAZIV:"+TIP_MODUL_NAZIV);
+	System.out.println("APL_SIF:"+APL_SIF);
+	System.out.println("SIF:"+SIF);
+	System.out.println("NAZIV:"+NAZIV);
+	System.out.println("DATOTEKA:"+DATOTEKA);
+	System.out.println("MOD_SIF:"+MOD_SIF);
+	System.out.println("TIP_SIF:"+TIP_SIF);
+	
+	
+
+	
+
+%>
+
+
+
